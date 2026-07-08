@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/theme.dart';
+import '../../../../core/audio_service.dart';
+import '../../../../core/notification_service.dart';
 import '../../settings/presentation/about_modal.dart';
 import '../../stats/data/stats_provider.dart';
 import 'widgets/animated_dial.dart';
@@ -24,6 +26,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
 
 
   void _startTimer() {
+    ref.read(notificationServiceProvider).showTimerNotification(remainingSeconds);
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (remainingSeconds > 0) {
         setState(() => remainingSeconds--);
@@ -33,6 +36,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
         final completedMinutes = totalSeconds ~/ 60;
         ref.read(statsProvider.notifier).recordSession(completedMinutes);
         HapticFeedback.heavyImpact();
+        ref.read(audioServiceProvider).playCompletionDing();
+        ref.read(notificationServiceProvider).showCompletionNotification();
         setState(() {
           isRunning = false;
           remainingSeconds = totalSeconds;
@@ -49,12 +54,14 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
         _startTimer();
       } else {
         _timer?.cancel();
+        ref.read(notificationServiceProvider).cancelTimerNotification();
       }
     });
   }
 
   void _resetTimer() {
     _timer?.cancel();
+    ref.read(notificationServiceProvider).cancelTimerNotification();
     setState(() {
       isRunning = false;
       remainingSeconds = totalSeconds;

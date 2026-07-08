@@ -3,7 +3,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/theme.dart';
+import '../../../../core/export_service.dart';
 import '../data/stats_provider.dart';
+import 'widgets/heatmap.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -34,6 +36,44 @@ class StatsScreen extends ConsumerWidget {
         centerTitle: false,
         backgroundColor: context.colors.background,
         elevation: 0,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await ref.read(exportServiceProvider).exportDataToCsv();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text(
+                      'Saved to your Downloads folder',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          letterSpacing: 1.0,
+                          fontWeight: FontWeight.w600),
+                      textAlign: TextAlign.center,
+                    ),
+                    backgroundColor: const Color(0xFF09090B),
+                    behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            child: Text(
+              'EXPORT',
+              style: TextStyle(
+                color: context.colors.textSecondary,
+                fontSize: 11,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+        ],
       ),
       body: sessions.isEmpty
           ? _buildEmpty(context)
@@ -164,6 +204,10 @@ class StatsScreen extends ConsumerWidget {
                       ),
                     ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3),
                   ),
+
+                  const SizedBox(height: AppTheme.spacingXxl),
+
+                  const HeatmapWidget().animate().fadeIn(delay: 250.ms).slideY(begin: 0.3),
 
                   const SizedBox(height: AppTheme.spacingXxl),
 

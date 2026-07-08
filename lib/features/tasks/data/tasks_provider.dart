@@ -7,12 +7,16 @@ class Task {
   final String id;
   final String title;
   final String project;
+  final List<String> tags;
+  final DateTime? completedAt;
   bool isCompleted;
 
   Task({
     required this.id,
     required this.title,
     required this.project,
+    this.tags = const [],
+    this.completedAt,
     this.isCompleted = false,
   });
 
@@ -20,6 +24,8 @@ class Task {
         'id': id,
         'title': title,
         'project': project,
+        'tags': tags,
+        'completedAt': completedAt?.toIso8601String(),
         'isCompleted': isCompleted,
       };
 
@@ -27,13 +33,24 @@ class Task {
         id: json['id'] as String,
         title: json['title'] as String,
         project: json['project'] as String,
+        tags: (json['tags'] as List?)?.map((e) => e as String).toList() ?? [],
+        completedAt: json['completedAt'] != null ? DateTime.parse(json['completedAt'] as String) : null,
         isCompleted: json['isCompleted'] as bool? ?? false,
       );
 
-  Task copyWith({String? title, String? project, bool? isCompleted}) => Task(
+  Task copyWith({
+    String? title,
+    String? project,
+    List<String>? tags,
+    DateTime? completedAt,
+    bool? isCompleted,
+  }) =>
+      Task(
         id: id,
         title: title ?? this.title,
         project: project ?? this.project,
+        tags: tags ?? this.tags,
+        completedAt: completedAt ?? this.completedAt,
         isCompleted: isCompleted ?? this.isCompleted,
       );
 }
@@ -65,29 +82,37 @@ class TasksNotifier extends Notifier<List<Task>> {
         _prefsKey, jsonEncode(state.map((t) => t.toJson()).toList()));
   }
 
-  void addTask(String title, String project) {
+  void addTask(String title, String project, [List<String> tags = const []]) {
     state = [
       ...state,
       Task(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: title,
         project: project,
+        tags: tags,
       ),
     ];
     _save();
   }
 
-  void editTask(String id, String title, String project) {
+  void editTask(String id, String title, String project, [List<String>? tags]) {
     state = state
-        .map((t) => t.id == id ? t.copyWith(title: title, project: project) : t)
+        .map((t) => t.id == id ? t.copyWith(title: title, project: project, tags: tags) : t)
         .toList();
     _save();
   }
 
   void toggleTask(String id) {
-    state = state
-        .map((t) => t.id == id ? t.copyWith(isCompleted: !t.isCompleted) : t)
-        .toList();
+    state = state.map((t) {
+      if (t.id == id) {
+        final nowCompleted = !t.isCompleted;
+        return t.copyWith(
+          isCompleted: nowCompleted,
+          completedAt: nowCompleted ? DateTime.now() : null,
+        );
+      }
+      return t;
+    }).toList();
     _save();
   }
 

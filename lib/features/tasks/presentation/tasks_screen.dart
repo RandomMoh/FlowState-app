@@ -20,11 +20,11 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       // dispose() — not after showDialog returns (which crashes during animation)
       builder: (ctx) => _TaskDialog(
         existingTask: existingTask,
-        onSave: (title, project) {
+        onSave: (title, project, tags) {
           if (existingTask != null) {
-            ref.read(tasksProvider.notifier).editTask(existingTask.id, title, project);
+            ref.read(tasksProvider.notifier).editTask(existingTask.id, title, project, tags);
           } else {
-            ref.read(tasksProvider.notifier).addTask(title, project);
+            ref.read(tasksProvider.notifier).addTask(title, project, tags);
           }
         },
       ),
@@ -217,10 +217,40 @@ class _TaskTile extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          subtitle: Text(
-            task.project,
-            style: TextStyle(
-                color: context.colors.textSecondary, fontSize: 12),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                task.project,
+                style: TextStyle(
+                    color: context.colors.textSecondary, fontSize: 12),
+              ),
+              if (task.tags.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Wrap(
+                    spacing: 4,
+                    runSpacing: 4,
+                    children: task.tags
+                        .map((t) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: context.colors.muted.withValues(alpha: 0.3),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                '#$t',
+                                style: TextStyle(
+                                  color: context.colors.textSecondary,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+            ],
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -254,7 +284,7 @@ class _TaskDialog extends StatefulWidget {
   });
 
   final Task? existingTask;
-  final void Function(String title, String project) onSave;
+  final void Function(String title, String project, List<String> tags) onSave;
 
   @override
   State<_TaskDialog> createState() => _TaskDialogState();
@@ -263,6 +293,7 @@ class _TaskDialog extends StatefulWidget {
 class _TaskDialogState extends State<_TaskDialog> {
   late final TextEditingController _titleCtrl;
   late final TextEditingController _projectCtrl;
+  late final TextEditingController _tagsCtrl;
 
   @override
   void initState() {
@@ -270,12 +301,15 @@ class _TaskDialogState extends State<_TaskDialog> {
     _titleCtrl = TextEditingController(text: widget.existingTask?.title ?? '');
     _projectCtrl =
         TextEditingController(text: widget.existingTask?.project ?? '');
+    _tagsCtrl = TextEditingController(
+        text: widget.existingTask?.tags.join(', ') ?? '');
   }
 
   @override
   void dispose() {
     _titleCtrl.dispose();
     _projectCtrl.dispose();
+    _tagsCtrl.dispose();
     super.dispose();
   }
 
@@ -300,6 +334,8 @@ class _TaskDialogState extends State<_TaskDialog> {
           _buildField(_titleCtrl, 'Task name'),
           const SizedBox(height: 12),
           _buildField(_projectCtrl, 'Project / label'),
+          const SizedBox(height: 12),
+          _buildField(_tagsCtrl, 'Tags (comma separated)'),
         ],
       ),
       actions: [
@@ -323,7 +359,12 @@ class _TaskDialogState extends State<_TaskDialog> {
             final project = _projectCtrl.text.trim().isEmpty
                 ? 'General'
                 : _projectCtrl.text.trim();
-            widget.onSave(title, project);
+            final tags = _tagsCtrl.text
+                .split(',')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList();
+            widget.onSave(title, project, tags);
             Navigator.pop(context);
           },
           child: Text(
