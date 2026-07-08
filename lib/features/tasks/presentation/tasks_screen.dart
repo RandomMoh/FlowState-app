@@ -39,12 +39,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'TASKS',
           style: TextStyle(letterSpacing: 4.0, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        backgroundColor: AppTheme.background,
+        backgroundColor: context.colors.background,
         elevation: 0,
         actions: [
           if (completed.isNotEmpty)
@@ -54,10 +54,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   ref.read(tasksProvider.notifier).deleteTask(t.id);
                 }
               },
-              child: const Text(
+              child: Text(
                 'CLEAR DONE',
                 style: TextStyle(
-                    color: AppTheme.textSecondary,
+                    color: context.colors.textSecondary,
                     fontSize: 11,
                     letterSpacing: 1.5),
               ),
@@ -81,7 +81,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 final task = tasks[index];
-                return _TaskTile(
+                final tile = _TaskTile(
                   task: task,
                   index: index,
                   onToggle: () =>
@@ -90,35 +90,40 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   onDelete: () =>
                       ref.read(tasksProvider.notifier).deleteTask(task.id),
                 )
-                .animate(key: ValueKey(task.id))
+                .animate()
                 .fadeIn(delay: (50 * index).ms)
                 .slideX(begin: 0.1);
+
+                return KeyedSubtree(
+                  key: ValueKey(task.id),
+                  child: tile,
+                );
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showTaskDialog(),
-        backgroundColor: AppTheme.primaryAccent,
-        foregroundColor: AppTheme.background,
+        backgroundColor: context.colors.primaryAccent,
+        foregroundColor: context.colors.background,
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        icon: const Icon(Icons.add),
-        label: const Text('ADD TASK',
+        icon: Icon(Icons.add),
+        label: Text('ADD TASK',
             style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1.5)),
       ),
     );
   }
 
   Widget _buildEmpty() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.check_circle_outline,
-              size: 64, color: AppTheme.textSecondary),
+              size: 64, color: context.colors.textSecondary),
           SizedBox(height: 16),
           Text(
             'NO TASKS YET',
             style: TextStyle(
-              color: AppTheme.textSecondary,
+              color: context.colors.textSecondary,
               letterSpacing: 3.0,
               fontWeight: FontWeight.w700,
             ),
@@ -126,7 +131,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           SizedBox(height: 8),
           Text(
             'Tap + to add your first task',
-            style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+            style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
           ),
         ],
       ),
@@ -160,17 +165,17 @@ class _TaskTile extends StatelessWidget {
         color: Colors.red.shade900,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        child: const Icon(Icons.delete_outline, color: Colors.white),
+        child: Icon(Icons.delete_outline, color: Colors.white),
       ),
       onDismissed: (_) => onDelete(),
       child: Container(
         margin: const EdgeInsets.only(bottom: AppTheme.spacingSm),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: context.colors.surface,
           border: Border.all(
             color: task.isCompleted
-                ? AppTheme.muted.withValues(alpha: 0.3)
-                : AppTheme.muted.withValues(alpha: 0.5),
+                ? context.colors.muted.withValues(alpha: 0.3)
+                : context.colors.muted.withValues(alpha: 0.5),
           ),
         ),
         child: ListTile(
@@ -186,18 +191,18 @@ class _TaskTile extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: task.isCompleted
-                    ? AppTheme.primaryAccent
+                    ? context.colors.primaryAccent
                     : Colors.transparent,
                 border: Border.all(
                   color: task.isCompleted
-                      ? AppTheme.primaryAccent
-                      : AppTheme.textSecondary,
+                      ? context.colors.primaryAccent
+                      : context.colors.textSecondary,
                   width: 2,
                 ),
               ),
               child: task.isCompleted
-                  ? const Icon(Icons.check,
-                      size: 14, color: AppTheme.background)
+                  ? Icon(Icons.check,
+                      size: 14, color: context.colors.background)
                   : null,
             ),
           ),
@@ -205,8 +210,8 @@ class _TaskTile extends StatelessWidget {
             task.title,
             style: TextStyle(
               color: task.isCompleted
-                  ? AppTheme.textSecondary
-                  : AppTheme.textPrimary,
+                  ? context.colors.textSecondary
+                  : context.colors.textPrimary,
               decoration:
                   task.isCompleted ? TextDecoration.lineThrough : null,
               fontWeight: FontWeight.w600,
@@ -214,24 +219,24 @@ class _TaskTile extends StatelessWidget {
           ),
           subtitle: Text(
             task.project,
-            style: const TextStyle(
-                color: AppTheme.textSecondary, fontSize: 12),
+            style: TextStyle(
+                color: context.colors.textSecondary, fontSize: 12),
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Edit button
               IconButton(
-                icon: const Icon(Icons.edit_outlined,
-                    color: AppTheme.textSecondary, size: 18),
+                icon: Icon(Icons.edit_outlined,
+                    color: context.colors.textSecondary, size: 18),
                 onPressed: onEdit,
                 tooltip: 'Edit',
               ),
               // Drag handle
               ReorderableDragStartListener(
                 index: index,
-                child: const Icon(Icons.drag_handle,
-                    color: AppTheme.textSecondary),
+                child: Icon(Icons.drag_handle,
+                    color: context.colors.textSecondary),
               ),
             ],
           ),
@@ -279,11 +284,11 @@ class _TaskDialogState extends State<_TaskDialog> {
     final isEditing = widget.existingTask != null;
 
     return AlertDialog(
-      backgroundColor: AppTheme.surface2,
+      backgroundColor: context.colors.surface2,
       title: Text(
         isEditing ? 'EDIT TASK' : 'NEW TASK',
-        style: const TextStyle(
-          color: AppTheme.textPrimary,
+        style: TextStyle(
+          color: context.colors.textPrimary,
           fontSize: 13,
           letterSpacing: 3.0,
           fontWeight: FontWeight.w800,
@@ -300,15 +305,15 @@ class _TaskDialogState extends State<_TaskDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(
+          child: Text(
             'CANCEL',
-            style: TextStyle(color: AppTheme.textSecondary),
+            style: TextStyle(color: context.colors.textSecondary),
           ),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.primaryAccent,
-            foregroundColor: AppTheme.background,
+            backgroundColor: context.colors.primaryAccent,
+            foregroundColor: context.colors.background,
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero),
           ),
@@ -323,7 +328,7 @@ class _TaskDialogState extends State<_TaskDialog> {
           },
           child: Text(
             isEditing ? 'SAVE' : 'ADD',
-            style: const TextStyle(fontWeight: FontWeight.w800),
+            style: TextStyle(fontWeight: FontWeight.w800),
           ),
         ),
       ],
@@ -335,26 +340,26 @@ class _TaskDialogState extends State<_TaskDialog> {
       controller: ctrl,
       autofocus: ctrl == _titleCtrl,
       textCapitalization: TextCapitalization.sentences,
-      style: const TextStyle(color: AppTheme.textPrimary),
+      style: TextStyle(color: context.colors.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: AppTheme.textSecondary),
+        hintStyle: TextStyle(color: context.colors.textSecondary),
         filled: true,
-        fillColor: AppTheme.background,
+        fillColor: context.colors.background,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-        border: const OutlineInputBorder(
+        border: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppTheme.muted),
+          borderSide: BorderSide(color: context.colors.muted),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(color: AppTheme.muted),
+          borderSide: BorderSide(color: context.colors.muted),
         ),
-        focusedBorder: const OutlineInputBorder(
+        focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
           borderSide:
-              BorderSide(color: AppTheme.primaryAccent, width: 2),
+              BorderSide(color: context.colors.primaryAccent, width: 2),
         ),
       ),
     );

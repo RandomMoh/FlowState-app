@@ -27,18 +27,19 @@ class StatsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'ANALYTICS',
           style: TextStyle(letterSpacing: 4.0, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
-        backgroundColor: AppTheme.background,
+        backgroundColor: context.colors.background,
         elevation: 0,
       ),
       body: sessions.isEmpty
-          ? _buildEmpty()
+          ? _buildEmpty(context)
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(AppTheme.spacingLg),
+              padding: const EdgeInsets.only(
+                  left: 20, right: 20, top: 16, bottom: 80),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -64,10 +65,10 @@ class StatsScreen extends ConsumerWidget {
 
                   const SizedBox(height: AppTheme.spacingXxl),
 
-                  const Text(
+                  Text(
                     'DAILY FOCUS — LAST 7 DAYS',
                     style: TextStyle(
-                      color: AppTheme.textSecondary,
+                      color: context.colors.textSecondary,
                       letterSpacing: 2.0,
                       fontSize: 11,
                     ),
@@ -92,8 +93,8 @@ class StatsScreen extends ConsumerWidget {
                                   padding: const EdgeInsets.only(top: 6),
                                   child: Text(
                                     dayLabels[i],
-                                    style: const TextStyle(
-                                        color: AppTheme.textSecondary,
+                                    style: TextStyle(
+                                        color: context.colors.textSecondary,
                                         fontSize: 12),
                                   ),
                                 );
@@ -108,8 +109,8 @@ class StatsScreen extends ConsumerWidget {
                                 if (value == 0) return const SizedBox.shrink();
                                 return Text(
                                   '${value.toInt()}m',
-                                  style: const TextStyle(
-                                      color: AppTheme.textSecondary,
+                                  style: TextStyle(
+                                      color: context.colors.textSecondary,
                                       fontSize: 10),
                                 );
                               },
@@ -124,7 +125,7 @@ class StatsScreen extends ConsumerWidget {
                           show: true,
                           drawVerticalLine: false,
                           getDrawingHorizontalLine: (_) => FlLine(
-                            color: AppTheme.surface,
+                            color: context.colors.surface,
                             strokeWidth: 1,
                           ),
                         ),
@@ -137,8 +138,8 @@ class StatsScreen extends ConsumerWidget {
                                 BarChartRodData(
                                   toY: weeklyMins[i],
                                   color: weeklyMins[i] > 0
-                                      ? AppTheme.primaryAccent
-                                      : AppTheme.surface,
+                                      ? context.colors.primaryAccent
+                                      : context.colors.surface,
                                   width: 22,
                                   borderRadius: BorderRadius.zero,
                                 ),
@@ -147,14 +148,14 @@ class StatsScreen extends ConsumerWidget {
                         ],
                         barTouchData: BarTouchData(
                           touchTooltipData: BarTouchTooltipData(
-                            getTooltipColor: (_) => AppTheme.surface,
+                            getTooltipColor: (_) => context.colors.surface,
                             getTooltipItem: (group, groupIndex, rod, rodIndex) {
                               final mins = rod.toY.toInt();
                               if (mins == 0) return null;
                               return BarTooltipItem(
                                 '${mins}m',
-                                const TextStyle(
-                                    color: AppTheme.textPrimary,
+                                TextStyle(
+                                    color: context.colors.textPrimary,
                                     fontWeight: FontWeight.w700),
                               );
                             },
@@ -166,10 +167,10 @@ class StatsScreen extends ConsumerWidget {
 
                   const SizedBox(height: AppTheme.spacingXxl),
 
-                  const Text(
+                  Text(
                     'RECENT SESSIONS',
                     style: TextStyle(
-                      color: AppTheme.textSecondary,
+                      color: context.colors.textSecondary,
                       letterSpacing: 2.0,
                       fontSize: 11,
                     ),
@@ -182,9 +183,9 @@ class StatsScreen extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 14),
                           decoration: BoxDecoration(
-                            color: AppTheme.surface,
+                            color: context.colors.surface,
                             border: Border.all(
-                                color: AppTheme.muted
+                                color: context.colors.muted
                                     .withValues(alpha: 0.3)),
                           ),
                           child: Row(
@@ -193,15 +194,15 @@ class StatsScreen extends ConsumerWidget {
                             children: [
                               Text(
                                 _formatDate(e.value.date),
-                                style: const TextStyle(
-                                    color: AppTheme.textSecondary,
+                                style: TextStyle(
+                                    color: context.colors.textSecondary,
                                     fontSize: 12,
                                     letterSpacing: 1.0),
                               ),
                               Text(
                                 '${e.value.durationMinutes}m',
-                                style: const TextStyle(
-                                  color: AppTheme.textPrimary,
+                                style: TextStyle(
+                                  color: context.colors.textPrimary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                 ),
@@ -216,17 +217,17 @@ class StatsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmpty() {
-    return const Center(
+  Widget _buildEmpty(BuildContext context) {
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.bar_chart, size: 64, color: AppTheme.textSecondary),
+          Icon(Icons.bar_chart, size: 64, color: context.colors.textSecondary),
           SizedBox(height: 16),
           Text(
             'NO DATA YET',
             style: TextStyle(
-              color: AppTheme.textSecondary,
+              color: context.colors.textSecondary,
               letterSpacing: 3.0,
               fontWeight: FontWeight.w700,
             ),
@@ -234,7 +235,7 @@ class StatsScreen extends ConsumerWidget {
           SizedBox(height: 8),
           Text(
             'Complete a focus session to see your stats',
-            style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+            style: TextStyle(color: context.colors.textSecondary, fontSize: 13),
           ),
         ],
       ),
@@ -274,19 +275,19 @@ class _StatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppTheme.spacingMd),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: context.colors.surface,
         border: Border.all(
-            color: AppTheme.muted.withValues(alpha: 0.4)),
+            color: context.colors.muted.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppTheme.textSecondary, size: 20),
+          Icon(icon, color: context.colors.textSecondary, size: 20),
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
-              color: AppTheme.textPrimary,
+            style: TextStyle(
+              color: context.colors.textPrimary,
               fontSize: 32,
               fontWeight: FontWeight.w700,
               letterSpacing: -1.0,
@@ -294,8 +295,8 @@ class _StatCard extends StatelessWidget {
           ),
           Text(
             label,
-            style: const TextStyle(
-              color: AppTheme.textSecondary,
+            style: TextStyle(
+              color: context.colors.textSecondary,
               fontSize: 10,
               letterSpacing: 2.0,
             ),

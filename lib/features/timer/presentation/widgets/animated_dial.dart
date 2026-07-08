@@ -22,11 +22,11 @@ class AnimatedDial extends StatelessWidget {
           height: 280,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppTheme.background,
+            color: context.colors.background,
             boxShadow: [
               if (isRunning)
                 BoxShadow(
-                  color: AppTheme.primaryAccent.withValues(alpha: 0.05),
+                  color: context.colors.primaryAccent.withValues(alpha: 0.05),
                   blurRadius: 40,
                   spreadRadius: 2,
                 ),
@@ -40,7 +40,7 @@ class AnimatedDial extends StatelessWidget {
                 size: const Size(280, 280),
                 painter: DialPainter(
                   progress: 1.0,
-                  color: AppTheme.surface,
+                  color: context.colors.surface,
                   strokeWidth: 2,
                 ),
               ),
@@ -49,7 +49,7 @@ class AnimatedDial extends StatelessWidget {
                 size: const Size(280, 280),
                 painter: DialPainter(
                   progress: progress,
-                  color: AppTheme.primaryAccent,
+                  color: context.colors.primaryAccent,
                   strokeWidth: 4,
                 ),
               ),
@@ -59,8 +59,8 @@ class AnimatedDial extends StatelessWidget {
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
                       fontFeatures: const [FontFeature.tabularFigures()],
                       color: isRunning
-                          ? AppTheme.textPrimary
-                          : AppTheme.textSecondary,
+                          ? context.colors.textPrimary
+                          : context.colors.textSecondary,
                       fontWeight: FontWeight.w300,
                     ),
                   )
@@ -71,7 +71,7 @@ class AnimatedDial extends StatelessWidget {
                     duration: 400.ms,
                     curve: Curves.easeOutBack,
                   )
-                  .tint(color: AppTheme.textPrimary, duration: 300.ms),
+                  .tint(color: context.colors.textPrimary, duration: 300.ms),
             ],
           ),
         )

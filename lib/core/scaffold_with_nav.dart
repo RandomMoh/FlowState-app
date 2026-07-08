@@ -26,46 +26,45 @@ class ScaffoldWithNavBar extends StatelessWidget {
   }
 }
 
-/// Fully custom bottom navigation bar — no generic NavigationBar widget.
 class _PremiumNavBar extends StatelessWidget {
   const _PremiumNavBar({required this.currentIndex, required this.onTap});
   final int currentIndex;
   final void Function(int) onTap;
 
-  static const _items = [
-    _NavItem(
-      label: 'Focus',
-      icon: _FocusIcon(),
-      activeIcon: _FocusIcon(active: true),
-    ),
-    _NavItem(
-      label: 'Tasks',
-      icon: _TasksIcon(),
-      activeIcon: _TasksIcon(active: true),
-    ),
-    _NavItem(
-      label: 'Stats',
-      icon: _StatsIcon(),
-      activeIcon: _StatsIcon(active: true),
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final items = [
+      _NavItem(
+        label: 'Focus',
+        icon: _FocusIcon(active: false, colors: context.colors),
+        activeIcon: _FocusIcon(active: true, colors: context.colors),
+      ),
+      _NavItem(
+        label: 'Tasks',
+        icon: _TasksIcon(active: false, colors: context.colors),
+        activeIcon: _TasksIcon(active: true, colors: context.colors),
+      ),
+      _NavItem(
+        label: 'Stats',
+        icon: _StatsIcon(active: false, colors: context.colors),
+        activeIcon: _StatsIcon(active: true, colors: context.colors),
+      ),
+    ];
+
     return Container(
       height: 72 + MediaQuery.of(context).padding.bottom,
-      decoration: const BoxDecoration(
-        color: AppTheme.background,
+      decoration: BoxDecoration(
+        color: context.colors.background,
         border: Border(
-          top: BorderSide(color: AppTheme.muted, width: 0.5),
+          top: BorderSide(color: context.colors.muted, width: 0.5),
         ),
       ),
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       child: Row(
         children: [
-          for (int i = 0; i < _items.length; i++)
+          for (int i = 0; i < items.length; i++)
             Expanded(child: _NavTile(
-              item: _items[i],
+              item: items[i],
               selected: currentIndex == i,
               onTap: () => onTap(i),
             )),
@@ -93,7 +92,6 @@ class _NavTile extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Active indicator dot above icon
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeOutCubic,
@@ -101,26 +99,22 @@ class _NavTile extends StatelessWidget {
               height: 2,
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
-                color: selected ? AppTheme.primaryAccent : Colors.transparent,
+                color: selected ? context.colors.primaryAccent : Colors.transparent,
                 borderRadius: BorderRadius.circular(1),
               ),
             ),
-            // Icon
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: selected
-                  ? item.activeIcon
-                  : item.icon,
+              child: selected ? item.activeIcon : item.icon,
             ),
             const SizedBox(height: 4),
-            // Label
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 10,
                 letterSpacing: 0.8,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? AppTheme.textPrimary : AppTheme.textTertiary,
+                color: selected ? context.colors.textPrimary : context.colors.textTertiary,
               ),
               child: Text(item.label),
             ),
@@ -138,28 +132,28 @@ class _NavItem {
   final Widget activeIcon;
 }
 
-
-/// Focus icon: a circle with a thin inner ring and a center dot
 class _FocusIcon extends StatelessWidget {
-  const _FocusIcon({this.active = false});
+  const _FocusIcon({this.active = false, required this.colors});
   final bool active;
+  final AppColors colors;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: const Size(22, 22),
-      painter: _FocusIconPainter(active: active),
+      painter: _FocusIconPainter(active: active, colors: colors),
     );
   }
 }
 
 class _FocusIconPainter extends CustomPainter {
   final bool active;
-  const _FocusIconPainter({required this.active});
+  final AppColors colors;
+  const _FocusIconPainter({required this.active, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final color = active ? AppTheme.textPrimary : AppTheme.textTertiary;
+    final color = active ? colors.textPrimary : colors.textTertiary;
     final strokeW = active ? 1.8 : 1.4;
     final center = Offset(size.width / 2, size.height / 2);
 
@@ -168,40 +162,37 @@ class _FocusIconPainter extends CustomPainter {
       ..strokeWidth = strokeW
       ..style = PaintingStyle.stroke;
 
-    // Outer ring
     canvas.drawCircle(center, size.width / 2 - strokeW / 2, paint);
-    // Inner ring
     canvas.drawCircle(center, size.width / 2 - 5.5, paint);
-    // Center dot
-    canvas.drawCircle(center, 1.8,
-        Paint()..color = color..style = PaintingStyle.fill);
+    canvas.drawCircle(center, 1.8, Paint()..color = color..style = PaintingStyle.fill);
   }
 
   @override
-  bool shouldRepaint(_FocusIconPainter old) => old.active != active;
+  bool shouldRepaint(_FocusIconPainter old) => old.active != active || old.colors != colors;
 }
 
-/// Tasks icon: a clean checklist (3 lines, 1st has a tick mark)
 class _TasksIcon extends StatelessWidget {
-  const _TasksIcon({this.active = false});
+  const _TasksIcon({this.active = false, required this.colors});
   final bool active;
+  final AppColors colors;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: const Size(22, 22),
-      painter: _TasksIconPainter(active: active),
+      painter: _TasksIconPainter(active: active, colors: colors),
     );
   }
 }
 
 class _TasksIconPainter extends CustomPainter {
   final bool active;
-  const _TasksIconPainter({required this.active});
+  final AppColors colors;
+  const _TasksIconPainter({required this.active, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final color = active ? AppTheme.textPrimary : AppTheme.textTertiary;
+    final color = active ? colors.textPrimary : colors.textTertiary;
     final strokeW = active ? 1.8 : 1.4;
     final paint = Paint()
       ..color = color
@@ -210,26 +201,19 @@ class _TasksIconPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
     final fillPaint = Paint()..color = color..style = PaintingStyle.fill;
 
-    // Row 1: checkbox (small square with tick)
     final boxRect = Rect.fromLTWH(0, 1, 7, 7);
     canvas.drawRect(boxRect, paint);
     if (active) {
-      // Tick inside
       final tickPath = Path()
         ..moveTo(1.5, 4.5)
         ..lineTo(3.0, 6.0)
         ..lineTo(5.5, 2.5);
       canvas.drawPath(tickPath, paint);
     }
-    // Line next to row 1
     canvas.drawLine(Offset(9.5, 4.5), Offset(size.width, 4.5), paint);
-
-    // Row 2: empty circle
     canvas.drawCircle(const Offset(3.5, 13), 3.0, paint);
-    // Line next to row 2
     canvas.drawLine(const Offset(9.5, 13), Offset(size.width, 13), paint);
 
-    // Row 3: empty circle (faded / incomplete)
     final faint = Paint()
       ..color = color.withValues(alpha: 0.4)
       ..strokeWidth = 1.2
@@ -240,47 +224,43 @@ class _TasksIconPainter extends CustomPainter {
       Offset(size.width * 0.7, size.height - 2),
       faint,
     );
-
-    // suppress unused
-    fillPaint.color;
   }
 
   @override
-  bool shouldRepaint(_TasksIconPainter old) => old.active != active;
+  bool shouldRepaint(_TasksIconPainter old) => old.active != active || old.colors != colors;
 }
 
-/// Stats icon: a minimal bar chart (3 bars, ascending)
 class _StatsIcon extends StatelessWidget {
-  const _StatsIcon({this.active = false});
+  const _StatsIcon({this.active = false, required this.colors});
   final bool active;
+  final AppColors colors;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       size: const Size(22, 22),
-      painter: _StatsIconPainter(active: active),
+      painter: _StatsIconPainter(active: active, colors: colors),
     );
   }
 }
 
 class _StatsIconPainter extends CustomPainter {
   final bool active;
-  const _StatsIconPainter({required this.active});
+  final AppColors colors;
+  const _StatsIconPainter({required this.active, required this.colors});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final color = active ? AppTheme.textPrimary : AppTheme.textTertiary;
+    final color = active ? colors.textPrimary : colors.textTertiary;
     final barW = 5.0;
     final gap = 2.0;
     final baseY = size.height - 1;
     final paint = Paint()..color = color..style = PaintingStyle.fill;
 
-    // 3 bars: short, medium, tall
     final heights = [8.0, 13.0, 18.0];
     for (int i = 0; i < 3; i++) {
       final left = i * (barW + gap);
       final h = heights[i];
-      // Inactive: outline only
       if (!active) {
         paint
           ..style = PaintingStyle.stroke
@@ -296,5 +276,5 @@ class _StatsIconPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_StatsIconPainter old) => old.active != active;
+  bool shouldRepaint(_StatsIconPainter old) => old.active != active || old.colors != colors;
 }

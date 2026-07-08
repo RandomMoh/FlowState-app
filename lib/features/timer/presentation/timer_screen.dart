@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../../core/theme.dart';
+import '../../settings/presentation/about_modal.dart';
 import '../../stats/data/stats_provider.dart';
 import 'widgets/animated_dial.dart';
 
@@ -84,11 +85,11 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
         return StatefulBuilder(
           builder: (ctx, setModalState) {
             return AlertDialog(
-              backgroundColor: AppTheme.surface,
-              title: const Text(
+              backgroundColor: context.colors.surface,
+              title: Text(
                 'SET FOCUS DURATION',
                 style: TextStyle(
-                  color: AppTheme.textPrimary,
+                  color: context.colors.textPrimary,
                   fontSize: 14,
                   letterSpacing: 2.0,
                   fontWeight: FontWeight.w800,
@@ -99,8 +100,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                 children: [
                   Text(
                     '$selectedMinutes min',
-                    style: const TextStyle(
-                      color: AppTheme.textPrimary,
+                    style: TextStyle(
+                      color: context.colors.textPrimary,
                       fontSize: 48,
                       fontWeight: FontWeight.w300,
                     ),
@@ -111,8 +112,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                     min: 5,
                     max: 120,
                     divisions: 23,
-                    activeColor: AppTheme.primaryAccent,
-                    inactiveColor: AppTheme.muted,
+                    activeColor: context.colors.primaryAccent,
+                    inactiveColor: context.colors.muted,
                     onChanged: (v) =>
                         setModalState(() => selectedMinutes = v.round()),
                   ),
@@ -127,15 +128,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                             child: Chip(
                               label: Text('${m}m'),
                               backgroundColor: selectedMinutes == m
-                                  ? AppTheme.primaryAccent
-                                  : AppTheme.background,
+                                  ? context.colors.primaryAccent
+                                  : context.colors.background,
                               labelStyle: TextStyle(
                                 color: selectedMinutes == m
-                                    ? AppTheme.background
-                                    : AppTheme.textSecondary,
+                                    ? context.colors.background
+                                    : context.colors.textSecondary,
                                 fontWeight: FontWeight.w700,
                               ),
-                              side: const BorderSide(color: AppTheme.muted),
+                              side: BorderSide(color: context.colors.muted),
                               shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.zero),
                             ),
@@ -148,13 +149,13 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('CANCEL',
-                      style: TextStyle(color: AppTheme.textSecondary)),
+                  child: Text('CANCEL',
+                      style: TextStyle(color: context.colors.textSecondary)),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryAccent,
-                    foregroundColor: AppTheme.background,
+                    backgroundColor: context.colors.primaryAccent,
+                    foregroundColor: context.colors.background,
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.zero),
                   ),
@@ -165,7 +166,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                     });
                     Navigator.pop(ctx);
                   },
-                  child: const Text('SET',
+                  child: Text('SET',
                       style: TextStyle(fontWeight: FontWeight.w800)),
                 ),
               ],
@@ -191,11 +192,11 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Text(
+        backgroundColor: context.colors.surface,
+        title: Text(
           'SESSION TYPE',
           style: TextStyle(
-            color: AppTheme.textPrimary,
+            color: context.colors.textPrimary,
             fontSize: 14,
             letterSpacing: 2.0,
             fontWeight: FontWeight.w800,
@@ -207,15 +208,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
             shrinkWrap: true,
             itemCount: labels.length,
             separatorBuilder: (_, _) =>
-                const Divider(color: AppTheme.muted, height: 1),
+                Divider(color: context.colors.muted, height: 1),
             itemBuilder: (_, i) => ListTile(
               dense: true,
               title: Text(
                 labels[i],
                 style: TextStyle(
                   color: labels[i] == _label
-                      ? AppTheme.primaryAccent
-                      : AppTheme.textPrimary,
+                      ? context.colors.primaryAccent
+                      : context.colors.textPrimary,
                   fontWeight: labels[i] == _label
                       ? FontWeight.w800
                       : FontWeight.normal,
@@ -223,7 +224,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                 ),
               ),
               trailing: labels[i] == _label
-                  ? const Icon(Icons.check, color: AppTheme.primaryAccent)
+                  ? Icon(Icons.check, color: context.colors.primaryAccent)
                   : null,
               onTap: () {
                 setState(() => _label = labels[i]);
@@ -240,26 +241,26 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Text('SESSION COMPLETE',
+        backgroundColor: context.colors.surface,
+        title: Text('SESSION COMPLETE',
             style: TextStyle(
-                color: AppTheme.textPrimary,
+                color: context.colors.textPrimary,
                 letterSpacing: 2.0,
                 fontWeight: FontWeight.w800)),
         content: Text(
           'Great work! ${totalSeconds ~/ 60} minutes of $_label recorded.',
-          style: const TextStyle(color: AppTheme.textSecondary),
+          style: TextStyle(color: context.colors.textSecondary),
         ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryAccent,
-              foregroundColor: AppTheme.background,
+              backgroundColor: context.colors.primaryAccent,
+              foregroundColor: context.colors.background,
               shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.zero),
             ),
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('DONE',
+            child: Text('DONE',
                 style: TextStyle(fontWeight: FontWeight.w800)),
           ),
         ],
@@ -281,25 +282,39 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Session label — tap to change
-                GestureDetector(
-                  onTap: _showLabelPicker,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _label,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              letterSpacing: 4.0,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.textSecondary,
+                Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 48), // Balance for center alignment
+                  Expanded(
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: _showLabelPicker,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _label,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    letterSpacing: 4.0,
+                                    fontWeight: FontWeight.w700,
+                                    color: context.colors.textSecondary,
+                                  ),
                             ),
-                      ),
-                      const SizedBox(width: 6),
-                      const Icon(Icons.keyboard_arrow_down,
-                          color: AppTheme.textSecondary, size: 18),
-                    ],
+                            const SizedBox(width: 6),
+                            Icon(Icons.keyboard_arrow_down,
+                                color: context.colors.textSecondary, size: 18),
+                          ],
+                        ),
+                      ).animate().fadeIn(duration: 600.ms),
+                    ),
                   ),
-                ).animate().fadeIn(duration: 600.ms),
+                  IconButton(
+                    onPressed: () => showAboutModal(context),
+                    icon: Icon(Icons.more_horiz, color: context.colors.textSecondary),
+                  ),
+                ],
+              ),
 
                 const SizedBox(height: AppTheme.spacingXxl),
 
@@ -322,7 +337,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                   Text(
                     'Tap timer to change duration',
                     style: TextStyle(
-                      color: AppTheme.textSecondary.withValues(alpha: 0.6),
+                      color: context.colors.textSecondary.withValues(alpha: 0.6),
                       fontSize: 12,
                       letterSpacing: 1.0,
                     ),
@@ -338,17 +353,17 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                         horizontal: 48, vertical: 20),
                     decoration: BoxDecoration(
                       color: isRunning
-                          ? AppTheme.background
-                          : AppTheme.primaryAccent,
+                          ? context.colors.background
+                          : context.colors.primaryAccent,
                       border: Border.all(
-                          color: AppTheme.primaryAccent, width: 2),
+                          color: context.colors.primaryAccent, width: 2),
                     ),
                     child: Text(
                       isRunning ? 'PAUSE' : 'START FOCUS',
                       style: TextStyle(
                         color: isRunning
-                            ? AppTheme.primaryAccent
-                            : AppTheme.background,
+                            ? context.colors.primaryAccent
+                            : context.colors.background,
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 2.0,
@@ -365,10 +380,10 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                 // Reset button
                 GestureDetector(
                   onTap: _resetTimer,
-                  child: const Text(
+                  child: Text(
                     'RESET',
                     style: TextStyle(
-                      color: AppTheme.textSecondary,
+                      color: context.colors.textSecondary,
                       fontSize: 12,
                       letterSpacing: 2.0,
                       fontWeight: FontWeight.w600,
